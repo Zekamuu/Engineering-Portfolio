@@ -1,0 +1,23 @@
+// This Pine Script™ code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © ZekromDaOne
+
+//@version=6
+indicator(title="ATR Bands", shorttitle="ATR Bands", overlay=true, timeframe="", timeframe_gaps=true)
+
+length = input.int(title="Length", defval=14, minval=1)
+smoothing = input.string(title="Smoothing", defval="RMA", options=["RMA", "SMA", "EMA", "WMA"])
+
+ma_function(source, length) =>
+    switch smoothing
+        "RMA" => ta.rma(source, length)
+        "SMA" => ta.sma(source, length)
+        "EMA" => ta.ema(source, length)
+        => ta.wma(source, length)
+
+atr = ma_function(ta.tr(true), length)
+current_price = close
+upper_band = current_price + atr
+lower_band = current_price - atr
+
+plot(upper_band, title="Upper ATR Band", color=color.new(color.green, 0))
+plot(lower_band, title="Lower ATR Band", color=color.new(color.red, 0))
