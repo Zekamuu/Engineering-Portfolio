@@ -1,0 +1,39 @@
+//@version=5
+strategy("Moving Average Crossover Bot with Risk Management", shorttitle="MA Bot RM v5", overlay=true)
+
+// Input parameters
+fast_length = input.int(9, title="Fast MA Length")
+slow_length = input.int(21, title="Slow MA Length")
+stop_loss_percent = input.float(2.0, title="Stop Loss (%)", step=0.1)
+take_profit_percent = input.float(4.0, title="Take Profit (%)", step=0.1) // Changed to 4% for a better R:R
+
+// Calculate stop loss and take profit points from percentages
+sl_points = strategy.position_avg_price * (stop_loss_percent / 100)
+tp_points = strategy.position_avg_price * (take_profit_percent / 100)
+
+// Calculate moving averages
+fast_ma = ta.sma(close, fast_length)
+slow_ma = ta.sma(close, slow_length)
+
+// Determine the trading signals
+long_condition = ta.crossover(fast_ma, slow_ma)
+short_condition = ta.crossunder(fast_ma, slow_ma)
+
+// --- Entry Logic ---
+if (long_condition)
+    strategy.entry("Long", strategy.long)
+
+if (short_condition)
+    strategy.entry("Short", strategy.short)
+
+// --- Exit Logic ---
+// This will place a stop-loss and take-profit order at the same time the entry order is filled.
+// It will apply to the most recent entry ("Long" or "Short").
+strategy.exit("Exit Long", from_entry="Long", loss=sl_points, profit=tp_points)
+strategy.exit("Exit Short", from_entry="Short", loss=sl_points, profit=tp_points)
+
+
+// Plot moving averages
+plot(fast_ma, title="Fast MA", color=color.blue)
+plot(slow_ma, title="Slow MA", color=color.red)
+
