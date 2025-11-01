@@ -1,3 +1,5 @@
+""" ML trading bot experiment """
+
 import pandas as pd
 import requests
 import lightgbm as lgb
@@ -52,7 +54,6 @@ def fetch_and_prepare_data(tickers):
     combined_df['s1'] = combined_df['pivot'] - (0.382 * (combined_df['h'] - combined_df['l']))
     combined_df['ema_10'] = grouped['c'].ewm(span=10, adjust=False).mean().values
 
-    # --- MODIFIED: Add .values to prevent index alignment errors ---
     # 1. RSI (Relative Strength Index)
     delta = grouped['c'].diff()
     gain = delta.where(delta > 0, 0)
